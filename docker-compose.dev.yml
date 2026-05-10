@@ -1,0 +1,68 @@
+services:
+
+  # ─── Application (mode développement) ──────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_HOST: db
+      DB_PORT: 3306
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+    ports:
+      - "80:80"
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+      - vendor-data:/var/www/html/vendor
+      - node-modules-data:/var/www/html/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - erp-dev-net
+
+  # ─── Base de données MySQL ──────────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-erp}
+      MYSQL_USER: ${DB_USERNAME:-erp_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-dev-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - erp-dev-net
+
+  # ─── Adminer (interface DB en dev) ─────────────────────────────────────────
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - erp-dev-net
+
+volumes:
+  db-dev-data:
+  vendor-data:
+  node-modules-data:
+
+networks:
+  erp-dev-net:
+    driver: bridge
