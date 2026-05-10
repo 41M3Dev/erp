@@ -21,12 +21,15 @@ services:
       CACHE_STORE: database
       QUEUE_CONNECTION: database
       LOG_LEVEL: error
+    volumes:
+      # Persistance des fichiers uploadés entre les redéploiements
+      - storage:/var/www/html/storage/app
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - dokploy-network
-      - internal
+      - dokploy-network   # exposé à Traefik
+      - internal          # communication privée avec la DB
 
   # ─── Base de données MySQL ──────────────────────────────────────────────────
   db:
@@ -38,7 +41,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/mysql   # données MySQL persistées
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
       interval: 10s
@@ -46,13 +49,14 @@ services:
       retries: 10
       start_period: 30s
     networks:
-      - internal
+      - internal   # jamais exposé à Traefik
 
 volumes:
-  db-data:
+  db-data:    # données MySQL
+  storage:    # fichiers uploadés Laravel
 
 networks:
   dokploy-network:
-    external: true   # réseau géré par Dokploy/Traefik
+    external: true   # réseau géré par Dokploy / Traefik
   internal:
     driver: bridge   # réseau privé app ↔ db
