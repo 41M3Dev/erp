@@ -7,19 +7,26 @@ services:
       dockerfile: Dockerfile
       target: production
     restart: unless-stopped
-    env_file: .env
     environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL}
       DB_HOST: db
-      DB_PORT: 3306
+      DB_PORT: "3306"
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       SESSION_DRIVER: database
       CACHE_STORE: database
-    ports:
-      - "80:80"
+      QUEUE_CONNECTION: database
+      LOG_LEVEL: error
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - erp-net
+      - dokploy-network
+      - internal
 
   # ─── Base de données MySQL ──────────────────────────────────────────────────
   db:
@@ -39,11 +46,13 @@ services:
       retries: 10
       start_period: 30s
     networks:
-      - erp-net
+      - internal
 
 volumes:
   db-data:
 
 networks:
-  erp-net:
-    driver: bridge
+  dokploy-network:
+    external: true   # réseau géré par Dokploy/Traefik
+  internal:
+    driver: bridge   # réseau privé app ↔ db
