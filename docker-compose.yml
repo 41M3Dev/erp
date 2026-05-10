@@ -43,11 +43,11 @@ services:
     volumes:
       - db-data:/var/lib/mysql   # données MySQL persistées
     healthcheck:
-      test: ["CMD-SHELL", "mysql -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT 1' 2>/dev/null"]
-      interval: 5s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent 2>/dev/null"]
+      interval: 10s
       timeout: 5s
-      retries: 20
-      start_period: 30s
+      retries: 15
+      start_period: 60s
     networks:
       - internal   # jamais exposé à Traefik
 
