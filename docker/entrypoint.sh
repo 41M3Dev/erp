@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-# ─── Générer la clé si absente ───────────────────────────────────────────────
+# ─── Vérifier que la clé est définie ─────────────────────────────────────────
 if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "base64:" ]; then
-    echo "[entrypoint] Génération de la clé d'application..."
-    php artisan key:generate --force
+    echo "[entrypoint] ERREUR : APP_KEY non définie. Définissez-la dans les variables d'environnement."
+    exit 1
 fi
 
 # ─── Attendre la base de données ─────────────────────────────────────────────
