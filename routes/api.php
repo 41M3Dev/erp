@@ -20,10 +20,10 @@ use App\Http\Controllers\StatistiqueDashboardController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('salaires', SalaireController::class);
-    Route::apiResource('conges', CongeController::class);
-    Route::apiResource('absences', AbsenceController::class);
-    Route::apiResource('transactions', FinanceController::class)->middleware('role:manager');
+    Route::apiResource('salaires', SalaireController::class)->names('api.salaires');
+    Route::apiResource('conges', CongeController::class)->names('api.conges');
+    Route::apiResource('absences', AbsenceController::class)->names('api.absences');
+    Route::apiResource('transactions', FinanceController::class)->names('api.transactions')->middleware('role:manager');
     Route::get('user', function () {
         return response()->json(auth()->user());
     });

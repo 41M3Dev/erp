@@ -32,9 +32,7 @@ Route::middleware(['auth'])->group(function (): void {
     // DASHBOARD
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/user/dashboard', [DashboardUtilisateurController::class, 'index'])->name('user.dashboard');
-    Route::post('/user/dashboard', [DashboardUtilisateurController::class, 'dashboard'])->name('user.dashboard');
     Route::get('/user/edit/{id}', [DashboardUtilisateurController::class, 'edit'])->name('user.edit');
     Route::put('/user/update/{id}', [DashboardUtilisateurController::class, 'update'])->name('user.update');
 

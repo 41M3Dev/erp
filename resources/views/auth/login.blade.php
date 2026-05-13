@@ -58,37 +58,48 @@
                 <div class="mb-4">
                     <label for="username" class="block text-gray-700 font-medium mb-2">Pseudo</label>
                     <input type="text" name="username" id="username" placeholder="Votre username" required autofocus
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#38d62c]"
-                        value="superadmin">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
                 </div>
                 <div class="mb-6">
                     <label for="mot_de_passe" class="block text-gray-700 font-medium mb-2">Mot de passe</label>
                     <input type="password" name="mot_de_passe" id="mot_de_passe" placeholder="Votre mot de passe"
                         required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#38d62c]"
-                        value="superadmin">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
                 </div>
                 <button type="submit"
                     class="w-full py-3 bg-[#38d62c] text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-300 cursor-pointer">Se
                     connecter</button>
             </form>
 
-            <div class="mt-8 text-center">
-                <button onclick="remplirUser()"
-                    class="inline-flex items-center gap-2 text-white bg-gray-500 px-6 py-3 rounded-lg shadow-lg text-base font-semibold hover:bg-gray-700 cursor-pointer transition duration-300">
-                    <i class="fas fa-user"></i> Utiliser un compte utilisateur test
-                </button>
+            <div class="mt-8">
+                <p class="text-center text-gray-500 text-sm mb-3">Comptes de démonstration</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="remplir('superadmin', 'Password123!')"
+                        class="text-white bg-purple-600 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-purple-800 cursor-pointer transition duration-300">
+                        Super Admin
+                    </button>
+                    <button type="button" onclick="remplir('admin', 'Password123!')"
+                        class="text-white bg-blue-600 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 cursor-pointer transition duration-300">
+                        Admin
+                    </button>
+                    <button type="button" onclick="remplir('manager.dubois', 'Password123!')"
+                        class="text-white bg-yellow-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-700 cursor-pointer transition duration-300">
+                        Manager
+                    </button>
+                    <button type="button" onclick="remplir('employe.petit', 'Password123!')"
+                        class="text-white bg-gray-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 cursor-pointer transition duration-300">
+                        Employé
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function remplirUser() {
-            document.getElementById('username').value = 'paul';
-            document.getElementById('mot_de_passe').value = 'paul';
+        function remplir(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('mot_de_passe').value = password;
         }
-
-
     </script>
 </body>
 
