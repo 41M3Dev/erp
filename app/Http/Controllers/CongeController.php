@@ -38,13 +38,25 @@ class CongeController extends Controller
 
     public function leave_request(Request $request)
     {
+        $employe = auth()->user()->employe;
+
+        if (!$employe) {
+            return redirect()->back()->with('error', 'Votre compte n\'est pas lié à un employé.');
+        }
+
+        $request->validate([
+            'type_conge' => 'required|in:RTT,CP,Maladie',
+            'date_debut'  => 'required|date',
+            'date_fin'    => 'required|date|after_or_equal:date_debut',
+        ]);
+
         $conge = new Conge();
-        $conge->id_employe = $request->user_id;
-        $conge->type_conge = $request->type_conge;
-        $conge->date_debut = $request->date_debut;
-        $conge->date_fin = $request->date_fin;
+        $conge->id_employe   = $employe->id_employe;
+        $conge->type_conge   = $request->type_conge;
+        $conge->date_debut   = $request->date_debut;
+        $conge->date_fin     = $request->date_fin;
         $conge->commentaires = $request->raison;
-        $conge->statut = 'En attente';
+        $conge->statut       = 'En attente';
         $conge->save();
 
         return redirect()->route('user.dashboard')->with('success', 'Demande de congé enregistrée avec succès !');
