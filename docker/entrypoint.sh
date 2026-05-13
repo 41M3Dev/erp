@@ -37,9 +37,10 @@ fi
 echo "[entrypoint] Migrations..."
 php artisan migrate --force
 
-# ─── Seed des rôles (firstOrCreate = idempotent, sans risque) ────────────────
-echo "[entrypoint] Initialisation des rôles..."
+# ─── Seed des rôles et utilisateurs (firstOrCreate = idempotent, sans risque) ─
+echo "[entrypoint] Initialisation des rôles et utilisateurs..."
 php artisan db:seed --class=RoleSeeder --force
+php artisan db:seed --class=UserSeeder --force
 
 # ─── Optimisations production ─────────────────────────────────────────────────
 if [ "$APP_ENV" = "production" ]; then
