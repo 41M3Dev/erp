@@ -42,16 +42,19 @@
         @endif
 
 
+        @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance']) || Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance', 'manager', 'livreur']))
         <!-- Dashboard Content: deux colonnes sur grand écran -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance']))
             <div class="bg-white p-4 rounded-lg shadow">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-lg font-medium">Finances</h3>
                 </div>
                 <canvas id="financeChart" height="40"></canvas>
             </div>
+            @endif
 
-
+            @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance', 'manager', 'livreur']))
             <!-- Card: Stock (réduite) -->
             <div class="bg-white p-4 rounded-lg shadow">
                 <div class="flex justify-between items-center mb-4">
@@ -59,19 +62,22 @@
                 </div>
                 <canvas id="stockChart" height="100"></canvas>
             </div>
+            @endif
         </div>
+        @endif
 
         <!-- Nouvelle ligne: Employés par Département + Nombre d'employés actifs -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'rh']))
             <!-- Card: Employés par Département (actifs uniquement) -->
             <div class="bg-white p-6 rounded-lg shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-medium">Employés par Département</h3>
                     <a href="{{ route('employes.index') }}" class="text-blue-600 hover:underline text-sm">Voir plus</a>
-
                 </div>
                 <canvas id="employeeDeptChart" height="150"></canvas>
             </div>
+            @endif
 
             <!-- Card: Nombre d'Employés Actifs -->
             <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center justify-center">
@@ -87,6 +93,7 @@
         // Configuration globale de Chart.js
         Chart.defaults.font.size = 12;
 
+        @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance']))
         // ---------------------------
         // Finances (Pie Chart)
         const financeData = @json($financeStats);
@@ -120,7 +127,9 @@
                 }
             }
         });
+        @endif
 
+        @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance', 'manager', 'livreur']))
         // ---------------------------
         // Stock (Bar Chart horizontal)
         const stockData = @json($stockStats);
@@ -156,7 +165,9 @@
                 }
             }
         });
+        @endif
 
+        @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'rh']))
         // ---------------------------
         // Employés par Département (actifs) - Bar Chart horizontal
         const employeeDeptData = @json($employeeDeptStats);
@@ -182,5 +193,6 @@
                 plugins: { legend: { display: false } }
             }
         });
+        @endif
     </script>
 @endsection
