@@ -14,7 +14,7 @@ class Employe extends Model
     protected $primaryKey = 'id_employe';
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'departement', 'date_embauche', 'date_debauche', 'actif'
+        'nom', 'prenom', 'email', 'telephone', 'departement', 'date_embauche', 'date_debauche', 'actif'
     ];
 
     public $timestamps = false;

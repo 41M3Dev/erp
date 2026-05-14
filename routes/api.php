@@ -23,12 +23,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('salaires', SalaireController::class)->names('api.salaires');
     Route::apiResource('conges', CongeController::class)->names('api.conges');
     Route::apiResource('absences', AbsenceController::class)->names('api.absences');
-    Route::apiResource('transactions', FinanceController::class)->names('api.transactions')->middleware('role:manager');
+    Route::apiResource('transactions', FinanceController::class)->names('api.transactions')->middleware('permission:manager,admin,superadmin');
     Route::get('user', function () {
         return response()->json(auth()->user());
     });
 
-    Route::get('/users', [UserController::class, 'index'])->middleware('role:admin');
+    Route::get('/users', [UserController::class, 'index'])->middleware('permission:admin,superadmin');
     Route::prefix('statistiques')->group(function () {
         Route::get('/employes', [StatistiqueEmployeController::class, 'index']);
         Route::get('/finances', [StatistiqueFinanceController::class, 'index']);

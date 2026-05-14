@@ -19,8 +19,4 @@ class Conge extends Model
     {
         return $this->belongsTo(Employe::class, 'id_employe', 'id_employe');
     }
-    public function utilisateur()
-    {
-        return $this->belongsTo(Utilisateur::class, 'id_employe', 'id_employe');
-    }
 }

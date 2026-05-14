@@ -55,12 +55,13 @@ class StockController extends Controller
         $stock = Stock::findOrFail($id);
 
         $data = $request->validate([
-            'nom_produit' => 'required|string|max:150',
-            'description' => 'nullable|string',
-            'quantite' => 'required|integer',
-            'seuil_alerte' => 'nullable|integer',
-            'prix_achat' => 'nullable|numeric',
-            'prix_vente' => 'nullable|numeric',
+            'id_fournisseur' => 'nullable|integer|exists:fournisseurs,id_fournisseur',
+            'nom_produit'    => 'required|string|max:150',
+            'description'    => 'nullable|string',
+            'quantite'       => 'required|integer',
+            'seuil_alerte'   => 'nullable|integer',
+            'prix_achat'     => 'nullable|numeric',
+            'prix_vente'     => 'nullable|numeric',
         ]);
 
         $stock->update($data);
