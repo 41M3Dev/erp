@@ -132,10 +132,10 @@
                                                             <td class="py-3 px-[15px] text-[#636e72]">{{ $conge->date_fin }}</td>
                                                             <td class="py-3 px-[15px] text-[#636e72]">{{ $conge->type_conge }}</td>
                                                             <td class="py-3 px-[15px] @class([
-                                                                'text-[#f1c40f] font-medium' => strtolower($conge->statut) === 'pending',
-                                                                'text-[#38d62c] font-medium' => strtolower($conge->statut) === 'approved',
-                                                                'text-[#e74c3c] font-medium' => strtolower($conge->statut) === 'rejected',
-                                                                'text-[#636e72]' => !in_array(strtolower($conge->statut), ['pending', 'approved', 'rejected'])
+                                                                'text-[#f1c40f] font-medium' => strtolower($conge->statut) === 'en attente',
+                                                                'text-[#38d62c] font-medium' => strtolower($conge->statut) === 'validé',
+                                                                'text-[#e74c3c] font-medium' => strtolower($conge->statut) === 'annulé',
+                                                                'text-[#636e72]' => !in_array(strtolower($conge->statut), ['en attente', 'validé', 'annulé'])
                                                             ])">
                                                                 {{ $conge->statut }}
                                                             </td>

@@ -27,12 +27,11 @@ class CommandeController extends Controller
     {
         $data = $request->validate([
             'reference_commande' => 'required|string|max:100',
-            'id_fournisseur' => 'nullable|integer',
-            'destinataire' => 'nullable|string|max:255',
-            'statut_livraison' => 'required|string|max:50',
-            'date_livraison' => 'required|date',
+            'id_fournisseur'     => 'nullable|integer|exists:fournisseurs,id_fournisseur',
+            'destinataire'       => 'nullable|string|max:255',
+            'statut_livraison'   => 'required|in:En cours,Livré,Annulé',
+            'date_livraison'     => 'nullable|date',
         ]);
-
 
         Commande::create($data);
 
@@ -55,14 +54,14 @@ class CommandeController extends Controller
     {
         $commande = Commande::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'reference_commande' => 'required|string|max:100',
-            'id_fournisseur' => 'nullable|integer',
-            'statut_livraison' => 'required|string|max:50',
-            'date_livraison' => 'nullable|date',
+            'id_fournisseur'     => 'nullable|integer|exists:fournisseurs,id_fournisseur',
+            'statut_livraison'   => 'required|in:En cours,Livré,Annulé',
+            'date_livraison'     => 'nullable|date',
         ]);
 
-        $commande->update($request->all());
+        $commande->update($data);
 
         return redirect()->route('commandes.index')
             ->with('success', 'Commande mise à jour avec succès !');

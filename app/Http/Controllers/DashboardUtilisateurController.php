@@ -17,8 +17,7 @@ class DashboardUtilisateurController extends Controller
         $employe = $utilisateur->employe;
 
         if (!$employe) {
-            return redirect()->back()->with('error', "Votre compte n'est pas lié à un employé, utilisez le compte utilisateur sur la page de connexion");
-
+            return redirect()->route('dashboard')->with('error', "Votre compte n'est pas lié à un dossier employé. Contactez l'administrateur.");
         }
 
         $conges = $employe->conges()->get();

@@ -63,40 +63,33 @@ class EmployeController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validation des données
         $request->validate([
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'departement' => 'required|string',
+            'nom'           => 'required|string|max:255',
+            'prenom'        => 'required|string|max:255',
+            'email'         => 'required|email|max:255|unique:employes,email,' . $id . ',id_employe',
+            'telephone'     => 'nullable|string|max:20|unique:employes,telephone,' . $id . ',id_employe',
+            'departement'   => 'required|in:rh,finance,informatique,livraison,employe',
             'date_embauche' => 'required|date',
             'date_debauche' => 'nullable|date|after_or_equal:date_embauche',
         ]);
 
-        // Trouver l'employé
         $employe = Employe::findOrFail($id);
 
-        // Préparer les données pour la mise à jour
         $data = $request->only([
-            'nom',
-            'prenom',
-            'email',
-            'departement',
-            'date_embauche',
-            'date_debauche'
+            'nom', 'prenom', 'email', 'telephone', 'departement', 'date_embauche', 'date_debauche'
         ]);
-
-        // Mettre à jour 'actif' en fonction de 'date_debauche'
         $data['actif'] = $request->filled('date_debauche') ? 0 : 1;
 
-        // Mettre à jour l'employé
-        $updated = $employe->update($data);
+        $employe->update($data);
 
-        // Vérifier si la mise à jour a réussi
-        if ($updated) {
-            return redirect()->route('employes.index')->with('success', 'Employé mis à jour avec succès.');
-        } else {
-            return redirect()->route('employes.index')->with('error', 'Erreur lors de la mise à jour de l\'employé.');
-        }
+        return redirect()->route('employes.index')->with('success', 'Employé mis à jour avec succès.');
+    }
+
+    public function destroy($id)
+    {
+        $employe = Employe::findOrFail($id);
+        $employe->delete();
+
+        return redirect()->route('employes.index')->with('success', 'Employé supprimé avec succès.');
     }
 }
