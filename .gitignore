@@ -58,3 +58,7 @@ Temporary Items
 .env
 /.claude/
 /tests/
+
+# Laravel / Node build artifacts
+/node_modules
+/public/build
