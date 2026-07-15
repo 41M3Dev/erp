@@ -1,109 +1,115 @@
 @extends('layouts.app')
 
+@section('title', 'Modifier un produit — ERP')
+
 @section('content')
-<main class="main-content flex-1 ml-0 md:ml-64 p-4 sm:p-6 text-sm">
-    <!-- Header -->
-    <header class="bg-white shadow p-4 rounded-lg mb-6">
-        <h2 class="text-2xl font-semibold">Modification du produit</h2>
-    </header>
+    @php
+        $input = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition';
+        $label = 'block text-sm font-medium text-slate-700 mb-1.5';
+    @endphp
 
-    <!-- Alertes -->
-    @if (session('success'))
-        <div class="mb-4 p-2 bg-green-100 text-green-700 rounded-md">
-            {{ session('success') }}
+    <div class="max-w-2xl mx-auto">
+        <!-- Header de page -->
+        <div class="mb-8">
+            <a href="{{ route('stocks.index') }}"
+                class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-4">
+                <x-icon name="arrow-left" />
+                Retour aux stocks
+            </a>
+            <h1 class="text-xl font-semibold text-slate-900">Modifier le produit : {{ $stock->nom_produit }}</h1>
         </div>
-    @endif
 
-    @if ($errors->any())
-        <div class="mb-4 p-2 bg-red-100 text-red-700 rounded-md">
-            <ul class="list-disc pl-4 mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        @include('partials.flash')
+
+        <!-- Formulaire -->
+        <div class="bg-white rounded-lg border border-slate-200 p-8">
+            <form action="{{ route('stocks.update', $stock->id_produit) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-4">
+                    <label for="nom_produit" class="{{ $label }}">Nom du produit</label>
+                    <input type="text" id="nom_produit" name="nom_produit"
+                        value="{{ old('nom_produit', $stock->nom_produit) }}" required class="{{ $input }}">
+                    @error('nom_produit')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_fournisseur" class="{{ $label }}">Fournisseur</label>
+                    <select id="id_fournisseur" name="id_fournisseur" class="{{ $input }}">
+                        <option value="">-- Sélectionnez un fournisseur --</option>
+                        @foreach ($fournisseurs as $fournisseur)
+                            <option value="{{ $fournisseur->id_fournisseur }}"
+                                {{ old('id_fournisseur', $stock->id_fournisseur) == $fournisseur->id_fournisseur ? 'selected' : '' }}>
+                                {{ $fournisseur->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('id_fournisseur')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="{{ $label }}">Description</label>
+                    <textarea id="description" name="description" rows="3"
+                        class="{{ $input }}">{{ old('description', $stock->description) }}</textarea>
+                    @error('description')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="quantite" class="{{ $label }}">Quantité</label>
+                        <input type="number" id="quantite" name="quantite"
+                            value="{{ old('quantite', $stock->quantite) }}" required class="{{ $input }}">
+                        @error('quantite')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="seuil_alerte" class="{{ $label }}">Seuil d'alerte</label>
+                        <input type="number" id="seuil_alerte" name="seuil_alerte"
+                            value="{{ old('seuil_alerte', $stock->seuil_alerte) }}" class="{{ $input }}">
+                        @error('seuil_alerte')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label for="prix_achat" class="{{ $label }}">Prix d'achat (€)</label>
+                        <input type="number" step="0.01" id="prix_achat" name="prix_achat"
+                            value="{{ old('prix_achat', $stock->prix_achat) }}" class="{{ $input }}">
+                        @error('prix_achat')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="prix_vente" class="{{ $label }}">Prix de vente (€)</label>
+                        <input type="number" step="0.01" id="prix_vente" name="prix_vente"
+                            value="{{ old('prix_vente', $stock->prix_vente) }}" class="{{ $input }}">
+                        @error('prix_vente')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3">
+                    <a href="{{ route('stocks.index') }}"
+                        class="bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors">
+                        Annuler
+                    </a>
+                    <button type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
+                        Mettre à jour le produit
+                    </button>
+                </div>
+            </form>
         </div>
-    @endif
-
-    <!-- Formulaire -->
-    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        <form action="{{ route('stocks.update', $stock->id_produit) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <!-- Nom du produit -->
-            <div class="mb-4">
-                <label for="nom_produit" class="block text-gray-700 font-medium mb-2">Nom du produit</label>
-                <input type="text" id="nom_produit" name="nom_produit"
-                    value="{{ old('nom_produit', $stock->nom_produit) }}" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- Fournisseur -->
-            <div class="mb-4">
-                <label for="id_fournisseur" class="block text-gray-700 font-medium mb-2">Fournisseur</label>
-                <select id="id_fournisseur" name="id_fournisseur"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                    <option value="">-- Sélectionnez un fournisseur --</option>
-                    @foreach ($fournisseurs as $fournisseur)
-                        <option value="{{ $fournisseur->id_fournisseur }}"
-                            {{ old('id_fournisseur', $stock->id_fournisseur) == $fournisseur->id_fournisseur ? 'selected' : '' }}>
-                            {{ $fournisseur->nom }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Quantité -->
-            <div class="mb-4">
-                <label for="quantite" class="block text-gray-700 font-medium mb-2">Quantité</label>
-                <input type="number" id="quantite" name="quantite"
-                    value="{{ old('quantite', $stock->quantite) }}" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- Description -->
-            <div class="mb-4">
-                <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
-                <textarea id="description" name="description" rows="3"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">{{ old('description', $stock->description) }}</textarea>
-            </div>
-
-            <!-- Seuil d'alerte -->
-            <div class="mb-4">
-                <label for="seuil_alerte" class="block text-gray-700 font-medium mb-2">Seuil d'alerte</label>
-                <input type="number" id="seuil_alerte" name="seuil_alerte"
-                    value="{{ old('seuil_alerte', $stock->seuil_alerte) }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- Prix d'achat -->
-            <div class="mb-4">
-                <label for="prix_achat" class="block text-gray-700 font-medium mb-2">Prix d'achat</label>
-                <input type="number" step="0.01" id="prix_achat" name="prix_achat"
-                    value="{{ old('prix_achat', $stock->prix_achat) }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- Prix de vente -->
-            <div class="mb-4">
-                <label for="prix_vente" class="block text-gray-700 font-medium mb-2">Prix de vente</label>
-                <input type="number" step="0.01" id="prix_vente" name="prix_vente"
-                    value="{{ old('prix_vente', $stock->prix_vente) }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- Boutons -->
-            <div class="flex flex-col sm:flex-row justify-between gap-2">
-                <a href="{{ route('stocks.index') }}"
-                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 text-center">
-                    Annuler
-                </a>
-                <button type="submit"
-                    class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200">
-                    Mettre à jour le produit
-                </button>
-            </div>
-        </form>
     </div>
-</main>
 @endsection

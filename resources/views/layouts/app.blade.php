@@ -4,173 +4,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini ERP </title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>@yield('title', 'ERP')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <style>
-        /* Animation pour la sidebar */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-                z-index: 50;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0 !important;
-            }
-
-            /* Barre de recherche dans le header cachée, dans la sidebar visible */
-            #search-bar-header {
-                display: none !important;
-            }
-
-            #search-bar-sidebar {
-                display: block !important;
-            }
-        }
-
-        /* Gestion du bouton burger */
-        @media (min-width: 769px) {
-            #burger-btn {
-                display: none !important;
-            }
-        }
-
-        /* Par défaut, la barre de recherche dans la sidebar est cachée */
-        #search-bar-sidebar {
-            display: none;
-        }
-
-        .fixed-info {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('scripts')
 </head>
 
-<body class="bg-gray-100 font-sans flex overflow-x-hidden">
+<body class="bg-slate-50 text-slate-900 antialiased">
 
-    <button id="burger-btn"
-        class="fixed top-4 right-4 z-50 p-3 bg-green-600 text-white rounded-xl shadow-lg hover:opacity-90 transition duration-300">
-        <i class="fas fa-bars text-2xl"></i>
+    @php
+        $navItem = fn(bool $active) => $active
+            ? 'flex items-center gap-3 py-2 px-3 rounded-md bg-indigo-50 text-indigo-600 font-medium'
+            : 'flex items-center gap-3 py-2 px-3 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors';
+        $groupLabel = 'text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1 mt-6';
+    @endphp
+
+    <!-- Bouton menu mobile -->
+    <button id="burger-btn" type="button" aria-label="Ouvrir le menu"
+        class="lg:hidden fixed top-4 right-4 z-50 p-2 bg-white border border-slate-200 rounded-md text-slate-600 hover:bg-slate-50 transition-colors">
+        <x-icon name="menu" class="w-5 h-5" />
     </button>
+    <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-slate-900/40 z-30 hidden"></div>
 
-
-
-    <aside id="sidebar" class="sidebar w-64 bg-gray-800 text-green-300 h-full fixed">
-        <div class="p-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold pt-5">Mini ERP</h1>
-            <button id="close-btn" class="md:hidden text-white">
-                <i class="fas fa-times"></i>
-            </button>
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 z-40 w-60 h-screen bg-white border-r border-slate-200 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200">
+        <!-- Logo -->
+        <div class="p-6">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-indigo-600 font-bold text-lg">
+                <span class="flex items-center justify-center w-8 h-8 bg-indigo-600 text-white rounded-md">
+                    <x-icon name="layout-dashboard" class="w-4 h-4" />
+                </span>
+                ERP
+            </a>
         </div>
-        <nav class="mt-6">
-            @if ((Auth::user()->hasAnyRole(['superadmin', 'admin'])))
-                <a href="{{ route('admin.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fa-solid fa-user-tie mr-3"></i> Admin
-                </a>
-            @endif
-            <a href="{{ route('dashboard') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto px-3 pb-4 text-sm">
+            <p class="{{ $groupLabel }} mt-0">Général</p>
+            <a href="{{ route('dashboard') }}" class="{{ $navItem(request()->routeIs('dashboard')) }}">
+                <x-icon name="layout-dashboard" />
+                Dashboard
             </a>
-            <a href="{{ route('user.dashboard') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                <i class="fa-solid fa-plane-departure mr-3"></i>Mon profil
+            <a href="{{ route('user.dashboard') }}"
+                class="{{ $navItem(request()->routeIs('user.dashboard') || request()->routeIs('user.edit')) }} mt-1">
+                <x-icon name="user" />
+                Mon profil
             </a>
-            @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'rh']))
-                <a href="{{ route('employes.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fas fa-users mr-3"></i> Employés
-                </a>
-                <a href="{{ route('conges.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fa-solid fa-calendar-days mr-3"></i> Gérer les congés
-                </a>
+
+            @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'rh', 'finance']))
+                <p class="{{ $groupLabel }}">RH</p>
+                @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'rh']))
+                    <a href="{{ route('employes.index') }}" class="{{ $navItem(request()->routeIs('employes.*')) }}">
+                        <x-icon name="users" />
+                        Employés
+                    </a>
+                    <a href="{{ route('conges.index') }}"
+                        class="{{ $navItem(request()->routeIs('conges.*')) }} mt-1">
+                        <x-icon name="calendar-days" />
+                        Congés
+                    </a>
+                @endif
+                @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance', 'rh']))
+                    <a href="{{ route('salaires.index') }}"
+                        class="{{ $navItem(request()->routeIs('salaires.*')) }} mt-1">
+                        <x-icon name="banknote" />
+                        Salaires
+                    </a>
+                @endif
             @endif
-            @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance', 'rh']))
-                <a href="{{ route('salaires.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fa-solid fa-dollar-sign mr-3"></i>Salaires
-                </a>
-            @endif
+
             @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance']))
-                <a href="{{ route('finances.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fa-solid fa-wallet mr-3"></i> Finances
+                <p class="{{ $groupLabel }}">Finance</p>
+                <a href="{{ route('finances.index') }}" class="{{ $navItem(request()->routeIs('finances.*')) }}">
+                    <x-icon name="wallet" />
+                    Finances
                 </a>
             @endif
+
             @if (Auth::user()->hasAnyRole(['superadmin', 'admin', 'finance', 'livreur', 'manager']))
-                <a href="{{ route('fournisseurs.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fas fa-tachometer-alt mr-3"></i> Fournisseurs
+                <p class="{{ $groupLabel }}">Logistique</p>
+                <a href="{{ route('stocks.index') }}" class="{{ $navItem(request()->routeIs('stocks.*')) }}">
+                    <x-icon name="package" />
+                    Stocks
                 </a>
-                <a href="{{ route('commandes.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fa-solid fa-cart-shopping mr-3"></i> Commandes
+                <a href="{{ route('fournisseurs.index') }}"
+                    class="{{ $navItem(request()->routeIs('fournisseurs.*')) }} mt-1">
+                    <x-icon name="building" />
+                    Fournisseurs
                 </a>
-                <a href="{{ route('stocks.index') }}" class="flex items-center p-4 hover:bg-gray-700 ">
-                    <i class="fas fa-warehouse mr-3"></i> Stocks
+                <a href="{{ route('commandes.index') }}"
+                    class="{{ $navItem(request()->routeIs('commandes.*')) }} mt-1">
+                    <x-icon name="shopping-cart" />
+                    Commandes
                 </a>
             @endif
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="flex items-center p-4 hover:bg-gray-700 text-red-400 w-full text-left">
-                    <i class="fa-solid fa-door-open mr-3"></i> Se déconnecter
-                </button>
-            </form>
+
+            @if (Auth::user()->hasAnyRole(['superadmin', 'admin']))
+                <p class="{{ $groupLabel }}">Admin</p>
+                <a href="{{ route('admin.index') }}" class="{{ $navItem(request()->routeIs('admin.*')) }}">
+                    <x-icon name="shield" />
+                    Gestion utilisateurs
+                </a>
+            @endif
         </nav>
+
+        <!-- Bloc utilisateur connecté -->
+        <div class="border-t border-slate-200 p-4">
+            @php
+                $roles = Auth::user()->roles;
+                $filteredRoles = $roles->reject(fn($role) => $role->nom_role === 'employe');
+                if ($filteredRoles->isEmpty()) {
+                    $filteredRoles = $roles;
+                }
+            @endphp
+            <div class="flex items-center gap-3">
+                <span
+                    class="flex items-center justify-center w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold shrink-0 uppercase">
+                    {{ mb_substr(Auth::user()->username ?? 'U', 0, 1) }}
+                </span>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium text-slate-900 truncate first-letter:uppercase">
+                        {{ Auth::user()->username ?? 'Utilisateur' }}
+                    </p>
+                    <p class="text-xs text-slate-500 truncate first-letter:uppercase">
+                        {{ $filteredRoles->pluck('nom_role')->join(', ') }}
+                    </p>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" title="Se déconnecter"
+                        class="p-2 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                        <x-icon name="log-out" />
+                    </button>
+                </form>
+            </div>
+        </div>
     </aside>
 
-    @yield('content')
+    <!-- Zone contenu -->
+    <div class="lg:pl-60">
+        <main class="min-h-screen p-4 sm:p-6 lg:p-8">
+            @yield('content')
+        </main>
+    </div>
 
+    <!-- Notification démo -->
     <div id="notif"
-        class="fixed-info fixed bottom-6 right-6 bg-white border border-gray-300 shadow-lg rounded-lg px-5 py-3 text-sm text-gray-700 max-w-xs z-50"
+        class="fixed bottom-6 right-6 bg-white border border-slate-200 shadow-sm rounded-lg px-4 py-3 text-sm text-slate-600 max-w-xs z-50"
         style="display: none;">
-        <div class="flex justify-between items-start">
-            <div class="pr-4">
-                <i class="fa-solid fa-circle-info text-green-600 mr-2"></i>
-                Faites toutes les modifications que vous souhaitez,<br>
+        <div class="flex items-start gap-3">
+            <x-icon name="info" class="w-4 h-4 mt-0.5 text-indigo-600 shrink-0" />
+            <p>
+                Faites toutes les modifications que vous souhaitez,
                 les données sont réinitialisées toutes les 12h (midi et minuit).
-            </div>
-            <button id="close-notif" class="text-gray-400 hover:text-gray-600 text-sm ml-2 mt-1">
-                <i class="fas fa-times"></i>
+            </p>
+            <button id="close-notif" type="button" aria-label="Fermer"
+                class="text-slate-400 hover:text-slate-600 shrink-0">
+                <x-icon name="x" />
             </button>
         </div>
     </div>
 
-
-
-
     <script>
         const burgerBtn = document.getElementById('burger-btn');
         const sidebar = document.getElementById('sidebar');
-        const closeBtn = document.getElementById('close-btn');
+        const overlay = document.getElementById('sidebar-overlay');
 
         burgerBtn?.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
         });
 
-        closeBtn?.addEventListener('click', () => {
-            sidebar.classList.remove('open');
+        overlay?.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
         });
 
         if (!sessionStorage.getItem('notifClosed')) {
@@ -182,7 +192,6 @@
             sessionStorage.setItem('notifClosed', 'true');
         });
     </script>
-
 
 </body>
 

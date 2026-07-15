@@ -1,134 +1,147 @@
 @extends('layouts.app')
 
+@section('title', 'Modifier une entrée financière — ERP')
+
 @section('content')
-<main class="main-content flex-1 ml-0 md:ml-64 p-4 sm:p-6 text-sm">
-    <header class="bg-white shadow p-4 rounded-lg mb-6">
-        <h2 class="text-2xl font-semibold">Modifier l'entrée financière</h2>
-    </header>
+    @php
+        $input = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition';
+        $label = 'block text-sm font-medium text-slate-700 mb-1.5';
+    @endphp
 
-    @if (session('success'))
-        <div class="mb-4 p-2 bg-green-100 text-green-700 rounded-md">
-            {{ session('success') }}
+    <div class="max-w-2xl mx-auto">
+        <!-- Header de page -->
+        <div class="mb-8">
+            <a href="{{ route('finances.index') }}"
+                class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-4">
+                <x-icon name="arrow-left" />
+                Retour aux finances
+            </a>
+            <h1 class="text-xl font-semibold text-slate-900">Modifier l'entrée financière</h1>
         </div>
-    @endif
 
-    @if ($errors->any())
-        <div class="mb-4 p-2 bg-red-100 text-red-700 rounded-md">
-            <ul class="list-disc pl-4 mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        @include('partials.flash')
+
+        <!-- Formulaire -->
+        <div class="bg-white rounded-lg border border-slate-200 p-8">
+            <form action="{{ route('finances.update', $finance->id_finance) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="type_operation" class="{{ $label }}">Type d'opération</label>
+                        <select id="type_operation" name="type_operation" required class="{{ $input }}">
+                            <option value="">-- Sélectionnez un type --</option>
+                            @foreach ($types as $type)
+                                <option value="{{ $type }}"
+                                    {{ old('type_operation', $finance->type_operation) == $type ? 'selected' : '' }}>
+                                    {{ ucfirst($type) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('type_operation')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="categorie" class="{{ $label }}">Catégorie</label>
+                        <select id="categorie" name="categorie" required class="{{ $input }}">
+                            <option value="">-- Sélectionnez une catégorie --</option>
+                            @foreach ($categories as $cat)
+                                <option value="{{ $cat }}"
+                                    {{ old('categorie', $finance->categorie) == $cat ? 'selected' : '' }}>
+                                    {{ $cat }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('categorie')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="{{ $label }}">Description</label>
+                    <textarea id="description" name="description" rows="3"
+                        class="{{ $input }}">{{ old('description', $finance->description) }}</textarea>
+                    @error('description')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="montant" class="{{ $label }}">Montant (€)</label>
+                        <input type="number" step="0.01" id="montant" name="montant"
+                            value="{{ old('montant', $finance->montant) }}" required class="{{ $input }}">
+                        @error('montant')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="date_operation" class="{{ $label }}">Date d'opération</label>
+                        <input type="date" id="date_operation" name="date_operation"
+                            value="{{ old('date_operation', $finance->date_operation) }}" required
+                            class="{{ $input }}">
+                        @error('date_operation')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_fournisseur" class="{{ $label }}">Fournisseur (optionnel)</label>
+                    <select id="id_fournisseur" name="id_fournisseur" class="{{ $input }}">
+                        <option value="">-- Aucun --</option>
+                        @foreach ($fournisseurs as $fournisseur)
+                            <option value="{{ $fournisseur->id_fournisseur }}"
+                                {{ old('id_fournisseur', $finance->id_fournisseur) == $fournisseur->id_fournisseur ? 'selected' : '' }}>
+                                {{ $fournisseur->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('id_fournisseur')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label for="statut" class="{{ $label }}">Statut</label>
+                        <select id="statut" name="statut" required class="{{ $input }}">
+                            <option value="">-- Sélectionnez un statut --</option>
+                            @foreach ($statuts as $stat)
+                                <option value="{{ $stat }}"
+                                    {{ old('statut', $finance->statut) == $stat ? 'selected' : '' }}>
+                                    {{ $stat }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('statut')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="reference_facture" class="{{ $label }}">Réf. facture (optionnel)</label>
+                        <input type="text" id="reference_facture" name="reference_facture"
+                            value="{{ old('reference_facture', $finance->reference_facture) }}" class="{{ $input }}">
+                        @error('reference_facture')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3">
+                    <a href="{{ route('finances.index') }}"
+                        class="bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors">
+                        Annuler
+                    </a>
+                    <button type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
+                        Mettre à jour
+                    </button>
+                </div>
+            </form>
         </div>
-    @endif
-
-    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        <form action="{{ route('finances.update', $finance->id_finance) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <!-- type_operation -->
-            <div class="mb-4">
-                <label for="type_operation" class="block text-gray-700 font-medium mb-2">Type d'opération</label>
-                <select id="type_operation" name="type_operation" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                    <option value="">-- Sélectionnez un type --</option>
-                    @foreach ($types as $type)
-                        <option value="{{ $type }}"
-                            {{ old('type_operation', $finance->type_operation) == $type ? 'selected' : '' }}>
-                            {{ ucfirst($type) }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- description -->
-            <div class="mb-4">
-                <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
-                <textarea id="description" name="description" rows="3"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">{{ old('description', $finance->description) }}</textarea>
-            </div>
-
-            <!-- montant -->
-            <div class="mb-4">
-                <label for="montant" class="block text-gray-700 font-medium mb-2">Montant</label>
-                <input type="number" step="0.01" id="montant" name="montant"
-                    value="{{ old('montant', $finance->montant) }}" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- date_operation -->
-            <div class="mb-4">
-                <label for="date_operation" class="block text-gray-700 font-medium mb-2">Date d'opération</label>
-                <input type="date" id="date_operation" name="date_operation"
-                    value="{{ old('date_operation', $finance->date_operation) }}" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <!-- categorie -->
-            <div class="mb-4">
-                <label for="categorie" class="block text-gray-700 font-medium mb-2">Catégorie</label>
-                <select id="categorie" name="categorie" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                    <option value="">-- Sélectionnez une catégorie --</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat }}"
-                            {{ old('categorie', $finance->categorie) == $cat ? 'selected' : '' }}>
-                            {{ $cat }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- id_fournisseur -->
-            <div class="mb-4">
-                <label for="id_fournisseur" class="block text-gray-700 font-medium mb-2">Fournisseur (optionnel)</label>
-                <select id="id_fournisseur" name="id_fournisseur"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                    <option value="">-- Aucun --</option>
-                    @foreach ($fournisseurs as $fournisseur)
-                        <option value="{{ $fournisseur->id_fournisseur }}"
-                            {{ old('id_fournisseur', $finance->id_fournisseur) == $fournisseur->id_fournisseur ? 'selected' : '' }}>
-                            {{ $fournisseur->nom }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- statut -->
-            <div class="mb-4">
-                <label for="statut" class="block text-gray-700 font-medium mb-2">Statut</label>
-                <select id="statut" name="statut" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                    <option value="">-- Sélectionnez un statut --</option>
-                    @foreach ($statuts as $stat)
-                        <option value="{{ $stat }}"
-                            {{ old('statut', $finance->statut) == $stat ? 'selected' : '' }}>
-                            {{ $stat }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- ref_facture -->
-            <div class="mb-6">
-                <label for="reference_facture" class="block text-gray-700 font-medium mb-2">Réf. Facture (optionnel)</label>
-                <input type="text" id="reference_facture" name="reference_facture"
-                    value="{{ old('reference_facture', $finance->reference_facture) }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-            </div>
-
-            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
-                <a href="{{ route('finances.index') }}"
-                    class="w-full sm:w-auto text-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200">
-                    Annuler
-                </a>
-                <button type="submit"
-                    class="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200">
-                    Mettre à jour
-                </button>
-            </div>
-        </form>
     </div>
-</main>
 @endsection

@@ -1,91 +1,140 @@
 @extends('layouts.app')
 
+@section('title', 'Nouvel employé — ERP')
+
 @section('content')
-    <main class="main-content flex-1 ml-0 md:ml-64 p-4 sm:p-6 text-sm">
-        <!-- Header de la page -->
-        <header class="bg-white shadow p-4 rounded-lg mb-6">
-            <h2 class="text-2xl font-semibold">Enregistrement d’un nouvel employé</h2>
-        </header>
+    @php
+        $input = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition';
+        $label = 'block text-sm font-medium text-slate-700 mb-1.5';
+        $derniersEmployes = \App\Models\Employe::orderByDesc('id_employe')->take(15)->get();
+    @endphp
 
-        <!-- Messages de succès et d'erreur -->
-        @if (session('success'))
-            <div class="mb-4 p-2 bg-green-100 text-green-700 rounded-md">
-                {{ session('success') }}
-            </div>
-        @endif
+    <!-- Header de page -->
+    <div class="mb-8">
+        <a href="{{ route('employes.index') }}"
+            class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-4">
+            <x-icon name="arrow-left" />
+            Retour aux employés
+        </a>
+        <nav class="flex items-center gap-1.5 text-sm text-slate-500 mb-1">
+            <a href="{{ route('dashboard') }}" class="hover:text-slate-700 transition-colors">Accueil</a>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5" />
+            <a href="{{ route('employes.index') }}" class="hover:text-slate-700 transition-colors">Employés</a>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5" />
+            <span class="text-slate-700">Nouvel employé</span>
+        </nav>
+        <h1 class="text-xl font-semibold text-slate-900">Nouvel employé</h1>
+    </div>
 
-        @if ($errors->any())
-            <div class="mb-4 p-2 bg-red-100 text-red-700 rounded-md">
-                <ul class="list-disc pl-4 mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    @include('partials.flash')
 
-        <!-- Formulaire d'enregistrement -->
-        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        <!-- Formulaire -->
+        <div class="lg:col-span-2 bg-white rounded-lg border border-slate-200 p-8">
             <form action="{{ route('employes.store') }}" method="POST">
                 @csrf
 
-                <div class="mb-4">
-                    <label for="nom" class="block text-gray-700 font-medium mb-2">Nom</label>
-                    <input type="text" id="nom" name="nom" value="{{ old('nom') }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="nom" class="{{ $label }}">Nom</label>
+                        <input type="text" id="nom" name="nom" value="{{ old('nom') }}" required
+                            class="{{ $input }}">
+                        @error('nom')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="prenom" class="{{ $label }}">Prénom</label>
+                        <input type="text" id="prenom" name="prenom" value="{{ old('prenom') }}" required
+                            class="{{ $input }}">
+                        @error('prenom')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="prenom" class="block text-gray-700 font-medium mb-2">Prénom</label>
-                    <input type="text" id="prenom" name="prenom" value="{{ old('prenom') }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                </div>
-
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-medium mb-2">Adresse Email</label>
+                    <label for="email" class="{{ $label }}">Adresse email</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                        class="{{ $input }}">
+                    @error('email')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
-                    <label for="telephone" class="block text-gray-700 font-medium mb-2">Téléphone</label>
+                    <label for="telephone" class="{{ $label }}">Téléphone</label>
                     <input type="text" id="telephone" name="telephone" value="{{ old('telephone') }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                        class="{{ $input }}">
+                    @error('telephone')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
-                    <label for="date_embauche" class="block text-gray-700 font-medium mb-2">Date d'embauche</label>
-                    <input type="date" id="date_embauche" name="date_embauche" value="{{ old('date_embauche') }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                    <label for="date_embauche" class="{{ $label }}">Date d'embauche</label>
+                    <input type="date" id="date_embauche" name="date_embauche" value="{{ old('date_embauche') }}"
+                        required class="{{ $input }}">
+                    @error('date_embauche')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="mb-6">
-                    <label for="departement" class="block text-gray-700 font-medium mb-2">Département</label>
-                    <select id="departement" name="departement" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c] bg-white">
+                <div class="mb-8">
+                    <label for="departement" class="{{ $label }}">Département</label>
+                    <select id="departement" name="departement" required class="{{ $input }}">
                         <option value="" disabled selected>Sélectionner un département</option>
                         <option value="rh" {{ old('departement') == 'rh' ? 'selected' : '' }}>RH</option>
                         <option value="finance" {{ old('departement') == 'finance' ? 'selected' : '' }}>Finance</option>
-                        <option value="informatique" {{ old('departement') == 'informatique' ? 'selected' : '' }}>Informatique
+                        <option value="informatique" {{ old('departement') == 'informatique' ? 'selected' : '' }}>
+                            Informatique</option>
+                        <option value="livraison" {{ old('departement') == 'livraison' ? 'selected' : '' }}>Livraison
                         </option>
-                        <option value="livraison" {{ old('departement') == 'livraison' ? 'selected' : '' }}>Livraison</option>
                         <option value="employe" {{ old('departement') == 'employe' ? 'selected' : '' }}>Employé</option>
                     </select>
+                    @error('departement')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                <div class="flex items-center justify-end gap-3">
                     <a href="{{ route('employes.index') }}"
-                        class="w-full sm:w-auto text-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200">
+                        class="bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors">
                         Annuler
                     </a>
                     <button type="submit"
-                        class="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200">
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
                         Enregistrer
                     </button>
                 </div>
             </form>
         </div>
-    </main>
+
+        <!-- Derniers employés -->
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-sm font-semibold text-slate-900">15 derniers employés</h2>
+            </div>
+            <ul>
+                @forelse ($derniersEmployes as $dernier)
+                    <li class="flex items-center gap-3 px-6 py-3 border-b border-slate-100 last:border-0">
+                        <span
+                            class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold shrink-0 uppercase">
+                            {{ mb_substr($dernier->nom, 0, 1) }}{{ mb_substr($dernier->prenom, 0, 1) }}
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-slate-900 truncate">
+                                {{ $dernier->nom }} {{ $dernier->prenom }}
+                            </p>
+                            <p class="text-xs text-slate-500 truncate capitalize">{{ $dernier->departement }}</p>
+                        </div>
+                    </li>
+                @empty
+                    <li class="px-6 py-8 text-center text-sm text-slate-500">Aucun employé.</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
 
     <script>
         document.getElementById('nom').addEventListener('input', updateEmail);

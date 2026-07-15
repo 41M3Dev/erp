@@ -1,81 +1,142 @@
 @extends('layouts.app')
 
+@section('title', 'Finances — ERP')
+
 @section('content')
-    <main class="main-content flex-1 ml-0 md:ml-64 p-4 sm:p-6 text-sm overflow-x-hidden">
-        <!-- Header -->
-        <header
-            class="bg-white shadow p-4 rounded-lg mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="text-2xl font-semibold">Gestion Finance</h2>
-            <a href="{{ route('finances.create') }}"
-                class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200">
-                + Nouvelle entrée
-            </a>
-        </header>
+    @php
+        $totalRevenus = $finances->where('type_operation', 'revenu')->sum('montant');
+        $totalDepenses = $finances->where('type_operation', 'dépense')->sum('montant');
+        $totalFactures = $finances->where('type_operation', 'facture')->sum('montant');
+        $typeColors = ['revenu' => 'emerald', 'dépense' => 'red', 'facture' => 'blue', 'taxe' => 'amber'];
+        $statutColors = ['Payé' => 'emerald', 'En attente' => 'amber', 'Annulé' => 'red'];
+    @endphp
 
-        @if (session('error'))
-            <div class="flex items-center gap-3 bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow mb-4">
-                <i class="fas fa-exclamation-triangle text-xl"></i>
-                <span class="text-base">{{ session('error') }}</span>
-            </div>
-        @endif
-        @if (session('success'))
-            <div
-                class="flex items-center gap-3 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow mb-4">
-                <i class="fas fa-check-circle text-xl"></i>
-                <span class="text-base">{{ session('success') }}</span>
-            </div>
-        @endif
+    <!-- Header de page -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+            <nav class="flex items-center gap-1.5 text-sm text-slate-500 mb-1">
+                <a href="{{ route('dashboard') }}" class="hover:text-slate-700 transition-colors">Accueil</a>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5" />
+                <span class="text-slate-700">Finances</span>
+            </nav>
+            <h1 class="text-xl font-semibold text-slate-900">Finances</h1>
+        </div>
+        <a href="{{ route('finances.create') }}"
+            class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
+            <x-icon name="plus" />
+            Nouvelle entrée
+        </a>
+    </div>
 
-        <!-- Filtres -->
-        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4">
-            <div class="mb-4 flex flex-col sm:flex-row gap-4">
-                <input type="text" id="searchInput" placeholder="Rechercher par description..."
-                    class="w-full sm:w-2/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button id="resetFilters"
-                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-200">
-                    Remettre à zéro
-                </button>
+    @include('partials.flash')
+
+    <!-- Résumé financier -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex items-center gap-4">
+            <span class="bg-indigo-50 text-indigo-600 rounded-md p-2">
+                <x-icon name="trending-up" class="w-5 h-5" />
+            </span>
+            <div>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($totalRevenus, 0, ',', ' ') }}&nbsp;€</p>
+                <p class="text-sm text-slate-500">Revenus</p>
             </div>
         </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex items-center gap-4">
+            <span class="bg-indigo-50 text-indigo-600 rounded-md p-2">
+                <x-icon name="trending-down" class="w-5 h-5" />
+            </span>
+            <div>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($totalDepenses, 0, ',', ' ') }}&nbsp;€</p>
+                <p class="text-sm text-slate-500">Dépenses</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex items-center gap-4">
+            <span class="bg-indigo-50 text-indigo-600 rounded-md p-2">
+                <x-icon name="file-text" class="w-5 h-5" />
+            </span>
+            <div>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($totalFactures, 0, ',', ' ') }}&nbsp;€</p>
+                <p class="text-sm text-slate-500">Factures</p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Tableau desktop -->
-        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 hidden sm:block overflow-x-auto">
-            <table class="w-full min-w-[1024px] text-left">
-                <thead class="bg-gray-200">
+    <!-- Filtres -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+        <div class="relative w-full sm:max-w-sm">
+            <x-icon name="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input type="text" id="searchInput" placeholder="Rechercher par description..."
+                class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+        </div>
+        <button id="resetFilters" type="button"
+            class="bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors">
+            Réinitialiser
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-4 py-3">Type</th>
-                        <th class="px-4 py-3">Description</th>
-                        <th class="px-4 py-3">Montant</th>
-                        <th class="px-4 py-3">Date d'opération</th>
-                        <th class="px-4 py-3">Catégorie</th>
-                        <th class="px-4 py-3">Fournisseur</th>
-                        <th class="px-4 py-3">Statut</th>
-                        <th class="px-4 py-3">Réf Facture</th>
-                        <th class="px-4 py-3">Actions</th>
+                        <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Type</th>
+                        <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Description</th>
+                        <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Montant</th>
+                        <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Date</th>
+                        <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Statut</th>
+                        <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Référence</th>
+                        <th class="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-6 py-3">
+                            Actions</th>
                     </tr>
                 </thead>
                 <tbody id="financeList">
                     @forelse ($finances as $finance)
-                        <tr class="border-b hover:bg-gray-50 finance-item"
+                        <tr class="group border-b border-slate-100 last:border-0 hover:bg-slate-50 finance-item"
                             data-description="{{ strtolower($finance->description ?? '') }}">
-                            <td class="px-4 py-3">{{ $finance->type_operation }}</td>
-                            <td class="px-4 py-3">{{ $finance->description ?? 'N/A' }}</td>
-                            <td class="px-4 py-3">{{ $finance->montant }}</td>
-                            <td class="px-4 py-3">{{ $finance->date_operation }}</td>
-                            <td class="px-4 py-3">{{ $finance->categorie }}</td>
-                            <td class="px-4 py-3">{{ $finance->fournisseur->nom ?? 'N/A' }}</td>
-                            <td class="px-4 py-3">{{ $finance->statut }}</td>
-                            <td class="px-4 py-3">{{ $finance->reference_facture ?? 'N/A' }}</td>
-                            <td class="px-4 py-3">
-                                <div class="flex gap-2">
-                                    <a href="{{ route('finances.edit', $finance->id_finance) }}"
-                                        class="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200">Éditer</a>
-                                    <form action="{{ route('finances.destroy', $finance->id_finance) }}" method="POST">
+                            <td class="px-6 py-4">
+                                <x-badge :color="$typeColors[strtolower($finance->type_operation)] ?? 'slate'"
+                                    class="capitalize">
+                                    {{ $finance->type_operation }}
+                                </x-badge>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-700 max-w-xs truncate"
+                                title="{{ $finance->description }}">
+                                {{ $finance->description ?? '—' }}
+                            </td>
+                            <td
+                                class="px-6 py-4 text-sm font-medium whitespace-nowrap {{ strtolower($finance->type_operation) === 'revenu' ? 'text-emerald-600' : (strtolower($finance->type_operation) === 'dépense' ? 'text-red-600' : 'text-slate-900') }}">
+                                {{ strtolower($finance->type_operation) === 'revenu' ? '+' : (strtolower($finance->type_operation) === 'dépense' ? '-' : '') }}{{ number_format($finance->montant, 2, ',', ' ') }}&nbsp;€
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">
+                                {{ \Carbon\Carbon::parse($finance->date_operation)->format('d/m/Y') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <x-badge :color="$statutColors[$finance->statut] ?? 'slate'">
+                                    {{ $finance->statut }}
+                                </x-badge>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-500">{{ $finance->reference_facture ?? '—' }}</td>
+                            <td class="px-6 py-4">
+                                <div
+                                    class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                                    <a href="{{ route('finances.edit', $finance->id_finance) }}" title="Modifier"
+                                        class="p-2 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+                                        <x-icon name="pencil" />
+                                    </a>
+                                    <form action="{{ route('finances.destroy', $finance->id_finance) }}" method="POST"
+                                        onsubmit="return confirm('Voulez-vous vraiment supprimer cette entrée ?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
-                                            class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200">
-                                            Supprimer
+                                        <button type="submit" title="Supprimer"
+                                            class="p-2 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                                            <x-icon name="trash" />
                                         </button>
                                     </form>
                                 </div>
@@ -83,42 +144,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center py-4 text-gray-500">Aucune entrée financière trouvée.</td>
+                            <td colspan="7" class="px-6 py-8 text-center text-sm text-slate-500">
+                                Aucune entrée financière trouvée.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
-        <!-- Cartes mobile -->
-        <div class="sm:hidden space-y-4" id="financeListMobile">
-            @forelse ($finances as $finance)
-                <div class="finance-item border border-gray-200 rounded-lg p-4 shadow"
-                    data-description="{{ strtolower($finance->description ?? '') }}">
-                    <div class="mb-1"><strong>Type :</strong> {{ $finance->type_operation }}</div>
-                    <div class="mb-1"><strong>Description :</strong> {{ $finance->description ?? 'N/A' }}</div>
-                    <div class="mb-1"><strong>Montant :</strong> {{ $finance->montant }}</div>
-                    <div class="mb-1"><strong>Date d'opération :</strong> {{ $finance->date_operation }}</div>
-                    <div class="mb-1"><strong>Catégorie :</strong> {{ $finance->categorie }}</div>
-                    <div class="mb-1"><strong>Fournisseur :</strong> {{ $finance->fournisseur->nom ?? 'N/A' }}</div>
-                    <div class="mb-1"><strong>Statut :</strong> {{ $finance->statut }}</div>
-                    <div class="mb-1"><strong>Réf Facture :</strong> {{ $finance->reference_facture ?? 'N/A' }}</div>
-                    <div class="flex gap-2 mt-3">
-                        <a href="{{ route('finances.edit', $finance->id_finance) }}"
-                            class="flex-1 px-3 py-1 bg-blue-500 text-white text-center rounded-md hover:bg-blue-600">Éditer</a>
-                        <form action="{{ route('finances.destroy', $finance->id_finance) }}" method="POST" class="flex-1">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="w-full px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">Supprimer</button>
-                        </form>
-                    </div>
-                </div>
-            @empty
-                <p class="text-center text-gray-500">Aucune entrée financière trouvée.</p>
-            @endforelse
-        </div>
-    </main>
+    </div>
 
     <script>
         function filterTable() {

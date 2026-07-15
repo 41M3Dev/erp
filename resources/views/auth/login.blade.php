@@ -3,50 +3,41 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Connexion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Connexion — ERP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <style>
-        .backdrop-blur {
-            backdrop-filter: blur(10px);
-        }
-
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-[#38d62c] to-[#55deaf] flex items-center justify-center">
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex items-center justify-center p-4">
 
-
-
-    <div id="main-content" class="w-full flex items-center justify-center">
-        <div class="bg-white bg-opacity-90 backdrop-blur p-10 rounded-xl shadow-2xl w-full max-w-md">
-            <div class="mb-6 text-center">
-                <h1 class="text-3xl font-bold text-gray-800">Bienvenue</h1>
-                <p class="text-gray-600 mt-2">Connectez-vous pour continuer</p>
+    <div class="w-full max-w-sm mx-auto">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-600 text-white rounded-lg mb-4">
+                    <x-icon name="layout-dashboard" class="w-6 h-6" />
+                </div>
+                <h1 class="text-xl font-bold text-indigo-600">ERP</h1>
+                <p class="text-sm text-slate-500 mt-1">Connectez-vous pour continuer</p>
             </div>
 
             @if (session('success'))
-                <div style="color: green;">
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-lg mb-4">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div style="color: red;">
+                <div class="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded-lg mb-4">
                     {{ session('error') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div style="color: red;">
+                <div class="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded-lg mb-4">
                     @foreach ($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach
@@ -56,38 +47,44 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 <div class="mb-4">
-                    <label for="username" class="block text-gray-700 font-medium mb-2">Pseudo</label>
+                    <label for="username" class="block text-sm font-medium text-slate-700 mb-1.5">Nom
+                        d'utilisateur</label>
                     <input type="text" name="username" id="username" placeholder="Votre username" required autofocus
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                 </div>
                 <div class="mb-6">
-                    <label for="mot_de_passe" class="block text-gray-700 font-medium mb-2">Mot de passe</label>
+                    <label for="mot_de_passe" class="block text-sm font-medium text-slate-700 mb-1.5">Mot de
+                        passe</label>
                     <input type="password" name="mot_de_passe" id="mot_de_passe" placeholder="Votre mot de passe"
                         required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                 </div>
                 <button type="submit"
-                    class="w-full py-3 bg-[#38d62c] text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-300 cursor-pointer">Se
-                    connecter</button>
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors cursor-pointer">
+                    Se connecter
+                </button>
             </form>
 
-            <div class="mt-8">
-                <p class="text-center text-gray-500 text-sm mb-3">Comptes de démonstration</p>
+            <!-- Comptes de démonstration -->
+            <div class="mt-8 bg-slate-50 rounded-lg p-4">
+                <p class="text-center text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
+                    Comptes de démonstration
+                </p>
                 <div class="grid grid-cols-2 gap-2">
                     <button type="button" onclick="remplir('superadmin', 'Password123!')"
-                        class="text-white bg-purple-600 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-purple-800 cursor-pointer transition duration-300">
+                        class="bg-white hover:bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors cursor-pointer">
                         Super Admin
                     </button>
                     <button type="button" onclick="remplir('admin', 'Password123!')"
-                        class="text-white bg-blue-600 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 cursor-pointer transition duration-300">
+                        class="bg-white hover:bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors cursor-pointer">
                         Admin
                     </button>
                     <button type="button" onclick="remplir('manager.dubois', 'Password123!')"
-                        class="text-white bg-yellow-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-700 cursor-pointer transition duration-300">
+                        class="bg-white hover:bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors cursor-pointer">
                         Manager
                     </button>
                     <button type="button" onclick="remplir('employe.petit', 'Password123!')"
-                        class="text-white bg-gray-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 cursor-pointer transition duration-300">
+                        class="bg-white hover:bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors cursor-pointer">
                         Employé
                     </button>
                 </div>
@@ -97,8 +94,12 @@
 
     <script>
         function remplir(username, password) {
-            document.getElementById('username').value = username;
-            document.getElementById('mot_de_passe').value = password;
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('mot_de_passe');
+            usernameInput.setAttribute('value', username);
+            passwordInput.setAttribute('value', password);
+            usernameInput.value = username;
+            passwordInput.value = password;
         }
     </script>
 </body>

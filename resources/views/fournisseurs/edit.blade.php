@@ -1,92 +1,100 @@
 @extends('layouts.app')
 
+@section('title', 'Modifier un fournisseur — ERP')
+
 @section('content')
-    <main class="main-content flex-1 ml-0 md:ml-64 p-4 sm:p-6 text-sm">
-        <header class="bg-white shadow p-4 rounded-lg mb-6">
-            <h2 class="text-2xl font-semibold">Modification du fournisseur</h2>
-        </header>
+    @php
+        $input = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition';
+        $label = 'block text-sm font-medium text-slate-700 mb-1.5';
+    @endphp
 
-        @if (session('success'))
-            <div class="mb-4 p-2 bg-green-100 text-green-700 rounded-md">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="max-w-2xl mx-auto">
+        <!-- Header de page -->
+        <div class="mb-8">
+            <a href="{{ route('fournisseurs.index') }}"
+                class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-4">
+                <x-icon name="arrow-left" />
+                Retour aux fournisseurs
+            </a>
+            <h1 class="text-xl font-semibold text-slate-900">Modifier le fournisseur : {{ $fournisseur->nom }}</h1>
+        </div>
 
-        @if ($errors->any())
-            <div class="mb-4 p-2 bg-red-100 text-red-700 rounded-md">
-                <ul class="list-disc pl-4 mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        @include('partials.flash')
 
-        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <!-- Formulaire -->
+        <div class="bg-white rounded-lg border border-slate-200 p-8">
             <form action="{{ route('fournisseurs.update', $fournisseur) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="mb-4">
-                    <label for="nom" class="block text-gray-700 font-medium mb-2">
-                        Nom du fournisseur
-                    </label>
-                    <input type="text" id="nom" name="nom" value="{{ old('nom', $fournisseur->nom) }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="nom" class="{{ $label }}">Nom du fournisseur</label>
+                        <input type="text" id="nom" name="nom" value="{{ old('nom', $fournisseur->nom) }}" required
+                            class="{{ $input }}">
+                        @error('nom')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="contact" class="{{ $label }}">Nom du contact</label>
+                        <input type="text" id="contact" name="contact"
+                            value="{{ old('contact', $fournisseur->contact) }}" class="{{ $input }}">
+                        @error('contact')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="email" class="{{ $label }}">Adresse email</label>
+                        <input type="email" id="email" name="email" value="{{ old('email', $fournisseur->email) }}"
+                            required class="{{ $input }}">
+                        @error('email')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="telephone" class="{{ $label }}">Téléphone</label>
+                        <input type="text" id="telephone" name="telephone"
+                            value="{{ old('telephone', $fournisseur->telephone) }}" class="{{ $input }}">
+                        @error('telephone')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="contact" class="block text-gray-700 font-medium mb-2">
-                        Nom du contact
-                    </label>
-                    <input type="text" id="contact" name="contact" value="{{ old('contact', $fournisseur->contact) }}"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                </div>
-
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-medium mb-2">
-                        Adresse Email
-                    </label>
-                    <input type="email" id="email" name="email" value="{{ old('email', $fournisseur->email) }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                </div>
-
-                <div class="mb-4">
-                    <label for="telephone" class="block text-gray-700 font-medium mb-2">
-                        Téléphone
-                    </label>
-                    <input type="text" id="telephone" name="telephone"
-                        value="{{ old('telephone', $fournisseur->telephone) }}"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
-                </div>
-
-                <div class="mb-4">
-                    <label for="adresse" class="block text-gray-700 font-medium mb-2">
-                        Adresse
-                    </label>
+                    <label for="adresse" class="{{ $label }}">Adresse</label>
                     <textarea id="adresse" name="adresse" rows="2"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">{{ old('adresse', $fournisseur->adresse) }}</textarea>
+                        class="{{ $input }}">{{ old('adresse', $fournisseur->adresse) }}</textarea>
+                    @error('adresse')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label for="site_web" class="block text-gray-700 font-medium mb-2">
-                        Site Web
-                    </label>
-                    <input type="text" id="site_web" name="site_web" value="{{ old('site_web', $fournisseur->site_web) }}"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#38d62c]">
+                <div class="mb-8">
+                    <label for="site_web" class="{{ $label }}">Site web</label>
+                    <input type="text" id="site_web" name="site_web"
+                        value="{{ old('site_web', $fournisseur->site_web) }}" placeholder="https://…"
+                        class="{{ $input }}">
+                    @error('site_web')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-6">
+                <div class="flex items-center justify-end gap-3">
                     <a href="{{ route('fournisseurs.index') }}"
-                        class="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 text-center">
+                        class="bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-md border border-slate-200 transition-colors">
                         Annuler
                     </a>
                     <button type="submit"
-                        class="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200">
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
                         Mettre à jour le fournisseur
                     </button>
                 </div>
             </form>
         </div>
-    </main>
+    </div>
 @endsection
